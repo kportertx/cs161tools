@@ -4,6 +4,7 @@ import sys, os
 
 if len(sys.argv) < 2:
     print "Need to pass a directory"
+    print "Example: intersect.py PathToSamples"
     exit()
 
 path = sys.argv[1]
