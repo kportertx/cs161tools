@@ -4,6 +4,7 @@ import sys, os
 
 if len(sys.argv) < 2:
     print "Need to pass a directory"
+    exit()
 
 path = sys.argv[1]
 ls = os.listdir(path)
