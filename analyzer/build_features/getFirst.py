@@ -9,7 +9,7 @@ if len(sys.argv) < 3:
 
 src = sys.argv[1]
 dest = sys.argv[2]
-length = sys.argv[3]
+length = int(sys.argv[3])
 
 ls = os.listdir(src)
 
@@ -22,6 +22,6 @@ for fname in ls:
         dest_path = dest + "/partial_" + fname
         dest_handle = open(dest_path, 'w')
         for i, l in enumerate(src_handle):
-            if i > length: break
+            if i >= length: break
             dest_handle.write(l)
 
