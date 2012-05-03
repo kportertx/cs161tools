@@ -8,8 +8,8 @@
 				* Note: This writes to stdout so you will need to redirect to a file to use later.
 				* Note: The analyzer requires all the features to be in one directory.
 3. Locate the trace you wish to analyze with this feature.
-    * Note: If you did the optional step in 2 then you will need to run removeInstructions.py against the trace to be analyzed.
 		1.  Run ./analyzer.py <path/to/features> <path/to/trace/of/interest> <numeric step size>
+		    * Note: If you did the optional step in 2 then you will need to run removeInstructions.py against the trace to be analyzed.
         * The lower the step size the more data points you will recieve.
         * This outputs a file per feature to the pwd.  If your feature was 'select' then it would output 'select.gp'
 4. Use gnuplot to prot your results
