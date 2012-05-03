@@ -1,11 +1,14 @@
 #! /usr/bin/python
 
-import sys, os
+import sys, os, multiprocessing
 
 if len(sys.argv) < 3:
     print "Need to pass a directory of features and a file to analyze and a step size"
     print "Example: ./analyzer.py features data.trace 100"
     exit()
+
+cpu_count = multiprocessing.cpu_count()
+num_processes = cpu_count + 2
 
 feature_path = sys.argv[1]
 feature_files = os.listdir(feature_path)
@@ -25,26 +28,31 @@ file_handle = open(data, 'r')
 data_list = file_handle.readlines()
 step = int(sys.argv[3])
 
-results = {}
-for i, feat in enumerate(features):
-    results[feature_files[i]] = []
-    for j in range(0, len(data_list), step):
-        stop = int(len(feat) * 5 + j)
-        if stop > len(data_list):
-            stop = len(data_list)
-        data_set = set()
-        data_set = set(data_list[j: stop])
+def processFeature(jfeat):
+    j, feat = jfeat
+    stop = int(len(feat) * 5 + j)
+    if stop > len(data_list):
+        stop = len(data_list)
+    data_set = set()
+    data_set = set(data_list[j: stop])
+    
+    res = data_set & feat
+    return float(len(res)) / len(feat)
 
-        res = data_set & feat
-        result = float(len(res)) / len(feat)
-        results[feature_files[i]].append(result)
+num_features = len(features)
+denom = len(features)
+data_len = len(data_list)
 
-
-
-# outputs a file readable by gnuplot
-for key in results.keys():
-    gp = open(key + '.gp', 'w')
-    for i, result in enumerate(results[key]):
+p = multiprocessing.Pool(num_processes)
+for z, feat in enumerate(features):
+    gp = open(feature_files[z] + '.gp', 'w')
+    for i, result in enumerate(p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, step)))):
+        # outputs a file readable by gnuplot
         line = str(float(i*step)) + " " + str(result) + "\n"
         gp.write(line)
+    gp.close()
+
+    percent_complete = int(100 * (float(z+1)/float(denom)))
+    sys.stdout.write("\r%d%%" %percent_complete)
+    sys.stdout.flush()
 
