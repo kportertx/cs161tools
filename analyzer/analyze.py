@@ -39,6 +39,9 @@ for i, feat in enumerate(features):
         result = float(len(res)) / len(feat)
         results[feature_files[i]].append(result)
 
+
+
+# outputs a file readable by gnuplot
 for key in results.keys():
     gp = open(key + '.gp', 'w')
     for i, result in enumerate(results[key]):

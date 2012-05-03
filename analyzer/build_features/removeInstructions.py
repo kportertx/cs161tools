@@ -21,7 +21,8 @@ for src in ls:
         dest_path = dest + "/" + src
         dest_handle = open(dest_path, 'w')
         for l in src_handle:
-            if l.strip().lower()[0] == 'i':
+            s = l.strip().lower()
+            if s == '' or s[0] != 'd':
                 continue
             dest_handle.write(l)
 
