@@ -44,6 +44,9 @@ denom = len(features)
 data_len = len(data_list)
 
 p = multiprocessing.Pool(num_processes)
+percent_complete = int(100 * (float(z+1)/float(denom)))
+sys.stdout.write("\r%d%%" %percent_complete)
+sys.stdout.flush()
 for z, feat in enumerate(features):
     gp = open(feature_files[z] + '.gp', 'w')
     for i, result in enumerate(p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, step)))):
