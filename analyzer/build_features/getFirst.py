@@ -14,7 +14,7 @@ length = sys.argv[3]
 ls = os.listdir(src)
 
 for fname in ls:
-    src_path = path + "/" + fname
+    src_path = src + "/" + fname
     if os.path.isfile(src_path):
         if os.path.getsize(src_path) < 300:
             continue
