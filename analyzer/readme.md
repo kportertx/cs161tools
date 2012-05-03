@@ -18,3 +18,6 @@
         * Note: For large files it may be useful to zoom in on the plot here is an example of that:
             *  gnuplot> set yrange [0:1]
             *  gnuplot> set xrange [280000: 330000]
+
+# Additional Information:
+We are getting better results by building features from a run of cachegrind with very small cache.  Continuing from this logic, we may be able to get even better results by building features with lackey; however, this would take a insane amount of time to create one feature.
