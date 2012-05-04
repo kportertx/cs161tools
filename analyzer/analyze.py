@@ -30,14 +30,13 @@ step = int(sys.argv[3])
 
 def processFeature(jfeat):
     j, feat = jfeat
-    stop = int(len(feat) * 5 + j)
+    stop = j + step #int(len(feat) * 5 + j)
     if stop > len(data_list):
         stop = len(data_list)
-    data_set = set()
     data_set = set(data_list[j: stop])
     
     res = data_set & feat
-    return float(len(res)) / len(feat)
+    return float(len(res)) / (stop - j)
 
 num_features = len(features)
 denom = len(features)
