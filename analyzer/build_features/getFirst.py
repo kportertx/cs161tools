@@ -21,7 +21,6 @@ for fname in ls:
         src_handle = open(src_path, 'r')
         dest_path = dest + "/partial_" + fname
         dest_handle = open(dest_path, 'w')
-        for i, l in enumerate(src_handle):
-            if i >= length: break
+        for i, l in enumerate(src_handle.readlines()[:length]):
             dest_handle.write(l)
 
