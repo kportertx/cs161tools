@@ -34,6 +34,8 @@ else:
     ls = os.listdir(feat2)
     for file_name in ls:
         file_name = feat2 + "/" + file_name
+        if feat1 == feat2:
+            continue # do not diff with self
         if os.path.isfile(file_name):
             if os.path.getsize(file_name) < 300:
                 continue
