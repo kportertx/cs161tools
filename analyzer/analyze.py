@@ -17,11 +17,12 @@ features = []
 for f in feature_files:
     file_path = feature_path + "/" + f
     if os.path.isfile(file_path):
-        feature = set()
         file_handle = open(file_path, 'r')
-        for l in file_handle:
-            feature.add(l)
+        feature = set(file_handle.readlines())
+        file_handle.close()
         features.append(feature)
+    else:
+        features.append(None)
 
 data = sys.argv[2]
 file_handle = open(data, 'r')
@@ -30,6 +31,8 @@ step = int(sys.argv[3])
 
 def processFeature(jfeat):
     j, feat = jfeat
+    if feat is None:
+        return None
     stop = j + step #int(len(feat) * 5 + j)
     if stop > len(data_list):
         stop = len(data_list)
@@ -47,6 +50,8 @@ percent_complete = 0
 sys.stdout.write("\r%d%%" %percent_complete)
 sys.stdout.flush()
 for z, feat in enumerate(features):
+    if feat is None:
+        continue
     gp = open(feature_files[z] + '.gp', 'w')
     for i, result in enumerate(p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, step)))):
         # outputs a file readable by gnuplot
