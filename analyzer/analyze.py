@@ -15,13 +15,13 @@ feature_files = os.listdir(feature_path)
 features = []
 remove = []
 
-for i,f in enumerate(feature_files):
+for f in feature_files:
     file_path = feature_path + "/" + f
     if not os.path.isfile(file_path):
-        remove.append(i)
+        remove.append(f)
 
-for i in remove:
-    feature_files.remove(i)
+for f in remove:
+    feature_files.remove(f)
 
 for f in feature_files:
     file_path = feature_path + "/" + f
