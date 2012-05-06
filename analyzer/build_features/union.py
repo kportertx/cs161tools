@@ -4,7 +4,7 @@ import sys, os
 
 if len(sys.argv) < 2:
     print "Need to pass a directory"
-    print "Example: intersect.py PathToSamples"
+    print "Example: union.py PathToSamples"
     exit()
 
 path = sys.argv[1]
@@ -18,7 +18,7 @@ for file_name in ls:
         if set1 is None:
             set1 = set(f.readlines())
         else:
-            set1 &= set(f.readlines())
+            set1 |= set(f.readlines())
             
         f.close()
 
