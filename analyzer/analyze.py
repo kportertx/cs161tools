@@ -65,3 +65,4 @@ for z, feat in enumerate(features):
     sys.stdout.write("\r%d%%" %percent_complete)
     sys.stdout.flush()
 
+print "\ndone"
