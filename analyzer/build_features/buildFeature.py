@@ -46,6 +46,7 @@ features = filter(os.path.isdir, map(lambda d: path + '/' + d, ls))
 feat_sets = []
 
 for feat in features: # set difference all of the features (must be outside this loop)
+    print feat
     targets = os.listdir(feat)
     targets = filter(os.path.isdir, map(lambda d: feat + '/' + d, targets))
     if len(targets) == 0:
@@ -54,6 +55,7 @@ for feat in features: # set difference all of the features (must be outside this
 
     target_set = None
     for target in targets: # Intersect all of the targets
+        print target
         traces = os.listdir(target)
         traces = filter(os.path.isfile, map(lambda f: target + '/' + f, traces))
         if len(traces) == 0:
