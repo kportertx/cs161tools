@@ -62,8 +62,9 @@ for z, feat in enumerate(features):
     data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, tstep)))
     for i, result in enumerate(data):
         # outputs a file readable by gnuplot
-        line = str(float(i*step)) + " " + str(result) + "\n"
-        gp.write(line)
+        if result > 0.3:
+            line = str(float(i*step)) + " " + str(result) + "\n"
+            gp.write(line)
     gp.close()
 
     percent_complete = int(100 * (float(z+1)/float(denom)))
