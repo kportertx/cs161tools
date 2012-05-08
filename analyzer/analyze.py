@@ -38,8 +38,7 @@ tstep = step
 
 def processFeature(jfeat):
     j, feat = jfeat
-    jump = max(len(feat), tstep)
-    stop = max(j + step, len(feat) + j)
+    stop = j + tstep 
     if stop > len(data_list):
         stop = len(data_list)
     data_set = set(data_list[j: stop])
