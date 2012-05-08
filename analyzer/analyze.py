@@ -34,10 +34,12 @@ data = sys.argv[2]
 file_handle = open(data, 'r')
 data_list = file_handle.readlines()
 step = int(sys.argv[3])
+tstep = step
 
 def processFeature(jfeat):
     j, feat = jfeat
-    stop = j + step #int(len(feat) * 5 + j)
+    jump = max(len(feat), tstep)
+    stop = max(j + step, len(feat) + j)
     if stop > len(data_list):
         stop = len(data_list)
     data_set = set(data_list[j: stop])
@@ -56,7 +58,8 @@ sys.stdout.flush()
 
 for z, feat in enumerate(features):
     gp = open(feature_files[z] + '.gp', 'w')
-    data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, step))):
+    tstep = min(step, len(feat))  # if step size is < len(feat) then overized step with length of feature
+    data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, tstep))):
     for i, result in enumerate(data):
         # outputs a file readable by gnuplot
         line = str(float(i*step)) + " " + str(result) + "\n"
