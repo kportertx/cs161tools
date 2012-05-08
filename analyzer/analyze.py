@@ -59,7 +59,7 @@ sys.stdout.flush()
 for z, feat in enumerate(features):
     gp = open(feature_files[z] + '.gp', 'w')
     tstep = min(step, len(feat))  # if step size is < len(feat) then overized step with length of feature
-    data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, tstep))):
+    data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, tstep)))
     for i, result in enumerate(data):
         # outputs a file readable by gnuplot
         line = str(float(i*step)) + " " + str(result) + "\n"
