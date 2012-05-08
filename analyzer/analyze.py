@@ -53,9 +53,11 @@ p = multiprocessing.Pool(num_processes)
 percent_complete = 0
 sys.stdout.write("\r%d%%" %percent_complete)
 sys.stdout.flush()
+
 for z, feat in enumerate(features):
     gp = open(feature_files[z] + '.gp', 'w')
-    for i, result in enumerate(p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, step)))):
+    data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, step))):
+    for i, result in enumerate(data):
         # outputs a file readable by gnuplot
         line = str(float(i*step)) + " " + str(result) + "\n"
         gp.write(line)
@@ -64,5 +66,7 @@ for z, feat in enumerate(features):
     percent_complete = int(100 * (float(z+1)/float(denom)))
     sys.stdout.write("\r%d%%" %percent_complete)
     sys.stdout.flush()
+
+result = []
 
 print "\ndone"
