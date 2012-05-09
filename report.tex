@@ -1,0 +1,52 @@
+\documentclass[11pt,a4paper, titlepage, oneside]{article}
+
+\begin{document}
+\title{MySQL Memory Trace Analysis}
+\author{Kevin Porter \and Nick Dryanovsky}
+\date{\today}
+\maketitle
+
+\setcounter{section}{-1}
+\section{Introduction}
+Increasingly servers are being moved to virtual machines and moved to the cloud to be managed by a third party. Through encryption, the third party can be prevented from directly accessing the information contained on the virtual machine, however this party does have physical access to the system. The third party can exploit the physical access and install a device to record memory requests through the \textbf{MCC}\footnote[0]{Memory Controller Chip}. This device could then be exploited by the attacker to obtain actionalbe intelligence about the inner working of specific applications on the clients server.
+
+\section{Overview}
+To obtain sensitive information from a particular application through the exploitation of \textbf{memory traces}\footnote{Requested memory addresses that missed in the lowest level of cache, along with the associated type of request (instruction read, data read, data write).} the attacker must first determine an application and a collection of application behaviours to target.  Once decided the attacker will need to generate signatures for these behaviours. Finally, the attacker will compare this set of signatures against an active memory trace of the target application and compute the similarity of each signature at various points.
+
+\section{Generating Signatures}
+\subsection{Step 1: Generate traces from target behaviors}
+Lower the cached size to 32 to 64kb and initiate each target behavior storing the results to disk.  Each target behavior will need around 5 to 10 runs. To get optimal signatures fill the cache to differnt levels before each run by running random behaviors within the application before running the target behavior and only store the tarket behavior's trace to disk.  Also note that fewer traces are needed with a smaller cache size. Furthermore, to help improve our performance we discarded instruction reads and data writes from all traces and obtained similar results.
+Once completed you will have M sets of N traces: \\$\{T1.1, T1.2, \ldots, T1.N\}, \{T2.1, T2.2, \ldots, T2.N\}. \ldots, \{TM.1, TM.2, \ldots, TM.N\}$.
+
+\subsubsection{Step 1.1: (Optional) False positive reduction}
+Create another trace that contains other common application behaviors that are not being targeted. This will be used later to reduce the number of false positives and is mainly needed when the application has other behaviors similar to one of the target behaviors.
+
+\subsection{Step 2: Maximize the set of possible tokens}
+To maximize the set of tokens\footnote{Memory addresses and access type from target behavior memory trace} that make up each trace, perform a union on all traces of a given behavior.  We will call the result the intermediate signature (IS). \\
+$IS1 = T1.1\cup T1.2\cup\ldots\cup T1.N$ \\
+$IS2 = T2.1\cup T2.2\cup\ldots\cup T2.N$ \\
+$\vdots$ \\
+$ISM = TM.1\cup TM.2\cup\ldots\cup TM.N$ 
+
+\subsubsection{Step 2.1: (Optional) Finer grained features}
+Some features may have several methods of execution. For a SQL server the attacker may want to know when a query with count() is called. The attacker would generate $\gamma$ queries containing this function but this would cause the resulting union to be huge and containing a lot more data than just count. The solution is to run N traces of each variation containing this function, union each variation and then intersect the resulting unions. \\
+$ISx = (Tx.1.1\cup Tx.1.2\cup\ldots\cup Tx.1.N)\cap(Tx.2.1\cup Tx2.2\cup\ldots\cup Tx.2.N)\cap\ldots\cap(Tx.\gamma.1\cup Tx\gamma.2\cup\ldots\cup Tx\gamma.N)$
+
+\subsection{Step 3: Eliminate similarity between targeted behaviors}
+It is possible that many of the target behaviors access many of the same addresses as other targeted behaviors (also step 1.1 behaviors). To eliminate the similarities we will compute the set difference of each IS to all other ISs. The resulting signature will be represented as S. \\
+$S1 = (((IS1 - IS2) - IS3)\ldots - ISM)$ \\
+$S2 = (((IS2 - IS1) - IS3)\ldots - ISM)$ \\
+$\vdots$ \\
+$SM = (((ISM - IS1) - IS2)\ldots - IS(M-1)$ 
+
+\section{Analyzing a Live Application Trace}
+Step through a live trace (standard cache size) with a predefined step length. The step size needs to be reasonable, anywhere from 20 - 200 should be sufficient. The step size will need to be fanessed till predictions as close a possible to what is acctually taking place. For each step create a set $\beta$ of all the memory accesses within that step. And compute the overlap coefficient of this set and each of the signatures. \\
+$Overlap Coefficient = \frac{|X\cap Y|}{min(|X|,|Y|)}$ \\
+So for our purpose we get: \\
+$Chance of feature in step = \frac{|\beta\cap Sx|}{min(|\beta|, |Sx|)}$ \\
+Safe each feature to seperate files and plot the results.
+
+\section{Conclusion}
+I'm tired... going to bed... must finish by 10pm tomorrow :(.
+
+\end{document}
