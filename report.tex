@@ -1,83 +1,231 @@
-\documentclass[11pt,a4paper, titlepage, oneside]{article}
+\documentclass[11pt, oneside]{article}
 \usepackage{listings}
+\usepackage{amsmath}
 
 \begin{document}
-\title{MySQL Memory Trace Analysis}
-\author{Kevin Porter \and Nick Dryanovsky}
+\title{Memory and Data Access Privacy}
+\author{
+    \makebox[.25\linewidth]{Ken Cheng} \and
+    \makebox[.25\linewidth]{Nick Dryanovsky} \and
+    \makebox[.25\linewidth]{Devan Lai} \and
+    \makebox[.25\linewidth]{Kevin Morgan} \and
+    \makebox[.25\linewidth]{Hugh Oh} \and
+    \makebox[.25\linewidth]{Kevin Porter} \and
+    \makebox[.25\linewidth]{Jacob Privalsky} \and
+    \makebox[.25\linewidth]{Adarsh Ramakrishnan} \and
+    \makebox[.25\linewidth]{Rafael Send}
+}
 \date{\today}
 \maketitle
 
-\setcounter{section}{-1}
-\part{Squid Proxy Analysis}
-\section{Application Overview}
-\section{Analysis Process}
-\section{Tools and Results}
-\section{Conclusion}
-\part{IRC Server Analysis}
-\section{Application Overview}
-\section{Analysis Process}
-\section{Tools and Results}
-\section{Conclusion}
-\part{Git Version Control Analysis}
-\section{Application Overview}
-\section{Analysis Process}
-\section{Tools and Results}
-\section{Conclusion}
-\part{MySQL Analysis}
+\begin{abstract}
+In this paper, we explore a novel way of invading computer-usage privacy. By
+examining the memory addresses of the requests to RAM and hard drive, we show
+that it is possible to extract information about the program that is running.
+\end{abstract}
+
+%\setcounter{section}{-1}
 \section{Introduction}
-With the popularization of virtualization technologies and decreasing cost of server co-location maintenance, an increasing number of servers are being moved to third party managed virtual machines somewhere on the cloud. While this modern approach to solving the economic dilemma of controlling company revenue spend    on on-site technical staff does contain attractive benefits, it unfortunately opens the door to many complications that are introduced in the process of preserving the integrity of sensitive customer data in a potentially hostile IT environment. As a result, the field of providing easy to implement fundamental precautionary solutions for the protection of confidential information is continuously developing and encryption of data transfer channels finds it place at the heart of the most essential toolkit that is available to every system administrator. Unfortunately, while encryption can certainly provide a level of data integrity protection, the fact that server physical access is available to maintenance technical staff that could be considered an untrusted source that can exploit its practically unlimited physical access to the hardware raises the issues of examining the efficiency of data encryption against hardware related attacks. In particular we would focus on the case where the previously mentioned untrusted party represented by the co-location technical staff is able to successfully install a device that is able to record memory requests through the \textbf{MCC}\footnote[0]{Memory Controller Chip}. This device could then be exploited by the attacker to obtain actionable intelligence about the inner working of specific applications on the clients server.
+With the popularization of virtualization technologies and decreasing cost of 
+server co-location maintenance, an increasing number of servers are being 
+moved to third party managed virtual machines somewhere on the cloud. While 
+this modern approach to solving the economic dilemma of controlling company 
+revenue spend    on on-site technical staff does contain attractive benefits, 
+it unfortunately opens the door to many complications that are introduced in 
+the process of preserving the integrity of sensitive customer data in a 
+potentially hostile IT environment. As a result, the field of providing easy 
+to implement fundamental precautionary solutions for the protection of 
+confidential information is continuously developing and encryption of data 
+transfer channels finds it place at the heart of the most essential toolkit 
+that is available to every system administrator. Unfortunately, while 
+encryption can certainly provide a level of data integrity protection, the 
+fact that server physical access is available to maintenance technical staff 
+that could be considered an untrusted source that can exploit its practically 
+unlimited physical access to the hardware raises the issues of examining the 
+efficiency of data encryption against hardware related attacks. In particular 
+we would focus on the case where the previously mentioned untrusted party 
+represented by the co-location technical staff is able to successfully install 
+a hardware device that is able to record memory and disk requests. This device 
+could then be exploited by the attacker to obtain actionable intelligence 
+about the inner working of specific applications on the clients server.
 
 \section{Overview}
-To obtain sensitive information from a particular application through the exploitation of \textbf{memory traces}\footnote{Requested memory addresses that missed in the lowest level of cache, along with the associated type of request (instruction read, data read, data write).} the attacker must first be able to fingerprint the application of interest and recognize or compile a set of data related to the targeted application's normal operational behaviors. Once such dataset of application specific actions has been generated a potential attacker would have a sufficient foundation to explore various data mining techniques by which he/she might be able to compare, match, analyze and eventually extract viable information from already collected signature traces from the targeted machine. As expected there are several approaches to performing this initial step and will present ours in the fallowing sections.
+To obtain sensitive information from a particular application through the 
+exploitation of \textbf{memory traces}\footnote{Requested memory addresses 
+that missed in the lowest level of cache, along with the associated type of 
+request (instruction read, data read, data write).} and 
+\textbf{disk traces}\footnote{Block read requests}, an attacker must first be 
+able to fingerprint the application of interest and recognize or compile a set 
+of data related to the targeted application's normal operational behaviors. 
+Once such dataset of application specific actions has been generated, a 
+potential attacker would have a sufficient foundation to explore various data 
+mining techniques by which he/she might be able to compare, match, analyze and 
+eventually extract viable information from the signature traces 
+from the targeted machine. The attacks vary with the target program, which are
+discussed in the following sections.
 
-\section{Generating Signatures}
-\subsection{Generate traces from target behaviors}
-As there are many various caching buffers that could potentially influence the amount of data that is being spilled from the CPU/RAM data bus, a flexible cache simulator with adjustable cache size is essential to this step of the data collection process. Our custom version of Cachegrind proved sufficient for providing us with relevant data once we realized that in order to avoid any parasitic hardware caching, its cache step size would need to be adjusted incrementally between 32KB and 12MB. This technique allowed us to successfully capture any instance of MySQL behavior related to moving data from and to disk.  Our iterative analysis led us to believe that each target behavior will need anywhere between 5 to 10 runs on average. That in order to get optimal signatures, filling the cache to different levels with data due to random application operations before each trace is performed and stored on disk would be a necessary. In addition, we noted that fewer traces are needed with a smaller cache size as the data outputted by the simulator seemed to be inversely proportional to the cache size. Finally, to help improve our performance we decided to discard instruction reads and data writes from all traces as their inclusion seemed to not significantly influence our results.
-Once completed you will have M sets of N traces: \\$\{T1.1, T1.2, \ldots, T1.N\}, \{T2.1, T2.2, \ldots, T2.N\}. \ldots, \{TM.1, TM.2, \ldots, TM.N\}$.
+\section{SVN Version Control Analysis}
+\subsection{Application Overview}
+\subsection{Analysis Process}
+\subsection{Tools and Results}
+\subsection{Conclusion}
+
+\section{IRC Server Analysis}
+\subsection{Application Overview}
+\subsection{Analysis Process}
+\subsection{Tools and Results}
+\subsection{Conclusion}
+
+\section{Squid Proxy Analysis}
+\subsection{Application Overview}
+\subsection{Analysis Process}
+\subsection{Tools and Results}
+\subsection{Conclusion}
+
+\section{MySQL Analysis}
+
+\subsection{Generating Signatures}
+\subsubsection{Generate traces from target behaviors}
+As there are many various caching buffers that could potentially influence the 
+amount of data that is being spilled from the CPU/RAM data bus, a flexible 
+cache simulator with adjustable cache size is essential to this step of the 
+data collection process. Our custom version of Cachegrind proved sufficient 
+for providing us with relevant data once we realized that in order to avoid 
+any parasitic hardware caching, its cache step size would need to be adjusted 
+incrementally between 32KB and 12MB. This technique allowed us to successfully 
+capture any instance of MySQL behavior related to moving data from and to 
+disk.  Our iterative analysis led us to believe that each target behavior will 
+need anywhere between 5 to 10 runs on average. That in order to get optimal 
+signatures, filling the cache to different levels with data due to random 
+application operations before each trace is performed and stored on disk would 
+be a necessary. In addition, we noted that fewer traces are needed with a 
+smaller cache size as the data outputted by the simulator seemed to be 
+inversely proportional to the cache size. Finally, to help improve our 
+performance we decided to discard instruction reads and data writes from all 
+traces as their inclusion seemed to not significantly influence our results.
+Once completed you will have M sets of N traces:
+$$\{T_{1.1}, T_{1.2}, \ldots, T_{1.N}\}, 
+  \{T_{2.1}, T_{2.2}, \ldots, T_{2.N}\},
+  \ldots,
+  \{T_{M.1}, T_{M.2}, \ldots, T_{M.N}\}$$.
 
 \subsubsection{(Optional) False positive reduction}
-Create another trace that contains other common application behaviors that are not being targeted. This will be used later to reduce the number of false positives and is mainly needed when the application has other behaviors similar to one of the target behaviors.
+Create another trace that contains other common application behaviors that are 
+not being targeted. This will be used later to reduce the number of false 
+positives and is mainly needed when the application has other behaviors 
+similar to one of the target behaviors.
 
-\subsection{Maximize the set of possible tokens}
-To maximize the set of tokens\footnote{Memory addresses and access type from target behavior memory trace} that make up each trace, perform a union on all traces of a given behavior.  We will call the result the intermediate signature (IS). \\
-$IS1 = T1.1\cup T1.2\cup\ldots\cup T1.N$ \\
-$IS2 = T2.1\cup T2.2\cup\ldots\cup T2.N$ \\
-$\vdots$ \\
-$ISM = TM.1\cup TM.2\cup\ldots\cup TM.N$ 
+\subsubsection{Maximize the set of possible tokens}
+To maximize the set of tokens\footnote{Memory addresses and access type from 
+target behavior memory trace} that make up each trace, perform a union on all 
+traces of a given behavior.  We will call the result the intermediate 
+signature (IS).
+\begin{align*}
+IS_1 =& T_{1.1}\cup T_{1.2}\cup\ldots\cup T_{1.N} \\
+IS_2 =& T_{2.1}\cup T_{2.2}\cup\ldots\cup T_{2.N} \\
+      &\vdots \\
+IS_M =& T_{M.1}\cup T_{M.2}\cup\ldots\cup T_{M.N}
+\end{align*}
 
 \subsubsection{(Optional) Finer grained features}
-Some features may have several methods of execution. For a SQL server the attacker may want to know when a query with count() is called. The attacker would generate $\gamma$ queries containing this function but this would cause the resulting union to be huge and containing a lot more data than just count. The solution is to run N traces of each variation containing this function, union each variation and then intersect the resulting unions. \\
-$ISx = (Tx.1.1\cup Tx.1.2\cup\ldots\cup Tx.1.N)\cap(Tx.2.1\cup Tx2.2\cup\ldots\cup Tx.2.N)\cap\ldots\cap(Tx.\gamma.1\cup Tx\gamma.2\cup\ldots\cup Tx\gamma.N)$
+Some features may have several methods of execution. For a SQL server the 
+attacker may want to know when a query with count() is called. The attacker 
+would generate $\gamma$ queries containing this function but this would cause 
+the resulting union to be huge and containing a lot more data than just count. 
+The solution is to run N traces of each variation containing this function, 
+union each variation and then intersect the resulting unions. \\
+$$IS_x = \bigcap_{i=1}^{\gamma}\bigcup_{j=1}^{N}T_{x.i.j}$$
 
-\subsection{Eliminate similarity between targeted behaviors}
-It is possible that many of the target behaviors access many of the same addresses as other targeted behaviors (also step 1.1 behaviors). To eliminate the similarities we will compute the set difference of each IS to all other ISs. The resulting signature will be represented as S. \\
-$S1 = (((IS1 - IS2) - IS3)\ldots - ISM)$ \\
-$S2 = (((IS2 - IS1) - IS3)\ldots - ISM)$ \\
-$\vdots$ \\
-$SM = (((ISM - IS1) - IS2)\ldots - IS(M-1)$ 
+\subsubsection{Eliminate similarity between targeted behaviors}
+It is possible that many of the target behaviors access many of the same 
+addresses as other targeted behaviors (also step 1.1 behaviors). To eliminate 
+the similarities we will compute the set difference of each IS to all other 
+ISs. The resulting signature will be represented as S. \\
+\begin{align*}
+S_1 =& (((IS_1 - IS_2) - IS_3)\ldots - IS_M) \\
+S_2 =& (((IS_2 - IS_1) - IS_3)\ldots - IS_M) \\
+    &\vdots \\
+S_M =& (((IS_M - IS_1) - IS_2)\ldots - IS_{M-1})
+\end{align*}
 
-\section{Analyzing a Live Application Trace}
-Step through a live trace (standard cache size) with a predefined step length. The step size needs to be reasonable, anywhere from 20 - 200 should be sufficient. The step size will need to be finessed till predictions as close a possible to what is actually taking place. For each step create a set $\beta$ of all the memory accesses within that step. And compute the overlap coefficient of this set and each of the signatures. \\
-$Overlap Coefficient = \frac{|X\cap Y|}{min(|X|,|Y|)}$ \\
-So for our purpose we get: \\
-$Chance of feature in step = \frac{|\beta\cap Sx|}{min(|\beta|, |Sx|)}$ \\
+\subsection{Analyzing a Live Application Trace}
+Step through a live trace (standard cache size) with a predefined step length. 
+The step size needs to be reasonable, anywhere from 20 - 200 should be 
+sufficient. The step size will need to be finessed till predictions as close a 
+possible to what is actually taking place. For each step create a set $\beta$ 
+of all the memory accesses within that step. And compute the overlap 
+coefficient of this set and each of the signatures.
+$$\text{Overlap Coefficient} = \frac{|X\cap Y|}{min(|X|,|Y|)}$$
+So for our purpose we get:
+$$\text{Chance of feature in step} = 
+    \frac{|\beta\cap S_x|}{min(|\beta|, |S_x|)}$$
 Safe each feature to separate files and plot the results.
 
 \section{Final Remarks}
-Ever since the popularization of the LAMP stack framework to enterprise production environments, the question of whether or not an open source tool like MySQL would be able to meet the fast paced demanding IT infrastructure has existed. An argument that practice has put to the test as many companies are becoming aware of the economical benefit that this product can provide over its commercial “big” brother Oracle. Moreover, as both of us have experience with developing on production implementations of the LAMP stack, we felt that this project would allow us to get an insight to any fundamental flows that MySQL might express under hostile infrastructure conditions and better understand of how this unwanted side effects could be resolved. With that motivation, we tried to simulate our development environment as close as possible to the one present in real world situations. We used reasonable assumptions, like the ability of potential perpetrator to install an external memory tracing device that would be able to listen to traffic on our server's memory bus. Its ability as a representative of the hardware maintenance team to exercise certain authority over machine's application platform – running processes as root and being able to collect application data. All reasonable privileges that in the end proved arguably sufficient to our successful ability to analyze our data.
-So what were we able to deduce after four months of exploiting every avenue for extracting any exploitable information from a company's MySQL server that might be running under the supervision of an untrusted third party:
+Ever since the popularization of the LAMP stack framework to enterprise 
+production environments, the question of whether or not an open source tool 
+like MySQL would be able to meet the fast paced demanding IT infrastructure 
+has existed. An argument that practice has put to the test as many companies 
+are becoming aware of the economical benefit that this product can provide 
+over its commercial “big” brother Oracle. Moreover, as both of us have 
+experience with developing on production implementations of the LAMP stack, we 
+felt that this project would allow us to get an insight to any fundamental 
+flows that MySQL might express under hostile infrastructure conditions and 
+better understand of how this unwanted side effects could be resolved. With 
+that motivation, we tried to simulate our development environment as close as 
+possible to the one present in real world situations. We used reasonable 
+assumptions, like the ability of potential perpetrator to install an external 
+memory tracing device that would be able to listen to traffic on our server's 
+memory bus. Its ability as a representative of the hardware maintenance team 
+to exercise certain authority over machine's application platform – running 
+processes as root and being able to collect application data. All reasonable 
+privileges that in the end proved arguably sufficient to our successful 
+ability to analyze our data.
+So what were we able to deduce after four months of exploiting every avenue 
+for extracting any exploitable information from a company's MySQL server that 
+might be running under the supervision of an untrusted third party:
 
 \begin{enumerate}
-\item We found that given a large well tailored dataset of application specific operation's traces, we were able to predict whether or not the operation was performed. For example, we can figure out if a query with a specific logical syntax was performed. Examples are :
-\begin{lstlisting}
-SELECT ___ FROM ___ WHERE ___ = ___; 
-SELECT ___ FROM ___ WHERE ___ > ___;
-SELECT ___ FROM ___ WHERE ___ LIKE ;
-\end{lstlisting}
-\item We can differentiate between the different type of SQL operations – SELECT, INSERT, DELETE, UPDATE, etc.
+\item We found that given a large well tailored dataset of application 
+specific operation's traces, we were able to predict whether or not the 
+operation was performed. For example, we can figure out if a query with a 
+specific logical syntax was performed. Examples are :
+\def\smalldash{\underbar{\hskip .3in}~}
+\begin{quote}
+{\tt SELECT \smalldash FROM \smalldash WHERE \smalldash = \smalldash;} \\
+{\tt SELECT \smalldash FROM \smalldash WHERE \smalldash > \smalldash;} \\
+{\tt SELECT \smalldash FROM \smalldash WHERE \smalldash LIKE \smalldash;}
+\end{quote}
+\item We can differentiate between the different type of SQL operations – 
+{\tt SELECT}, {\tt INSERT}, {\tt DELETE}, {\tt UPDATE}, etc.
       
-\item Though not able to pinpoint what table names, column names or data fields were being utilized within the queries, given more time we feel that as long as the data stream is not encrypted, we could potentially extract more query specific information as our initial goal was close to recovering database schema.
+\item Though not able to pinpoint what table names, column names or data 
+fields were being utilized within the queries, given more time we feel that as 
+long as the data stream is not encrypted, we could potentially extract more 
+query specific information as our initial goal was close to recovering 
+database schema.
 \end{enumerate}
 
-In summary, our part of the overall project proved sufficient to provide a good a foundation for a potentially more fine grained area of research on the topic. We feel that improving the current algorithm for analyzing the trace data would yield more descriptive results. However, we fear that such implementation could result into a solution with exponential running time. In addition, we believe that incorporating DNA analysis and plagiarism related analysis implementations would serve a good starting point for producing a more accurate data mining results. Finally, we feel convinced that if potential attacker is familiar with the database setup, which given the fact that MySQL is open source , and for example PrestaShop is also an open source online store application often installed with MySQL backend, data integrity exploitation is a possible treat. Moreover, since we were able to differentiate between MySQL operations, we believe that an attacker can successfully gain knowledge of the real workload of the latter mentioned host, which in turn would provide information to when would be the best time a memory trace should take place. Something that we are convinced the owner of the machine would not be happy to openly disclose. Though we did not have enough time to completely exploit the previously mentioned scenario, we have no doubt that the treat of information leakage is as present as ever and that the topic should be extensively researched as the popularity of Web-based applications and economically beneficial MySQL integrations is continuously increasing.
+In summary, our part of the overall project proved sufficient to provide a 
+good a foundation for a potentially more fine grained area of research on the 
+topic. We feel that improving the current algorithm for analyzing the trace 
+data would yield more descriptive results. However, we fear that such 
+implementation could result into a solution with exponential running time. In 
+addition, we believe that incorporating DNA analysis and plagiarism related 
+analysis implementations would serve a good starting point for producing a 
+more accurate data mining results. Finally, we feel convinced that if 
+potential attacker is familiar with the database setup, which given the fact 
+that MySQL is open source , and for example PrestaShop is also an open source 
+online store application often installed with MySQL backend, data integrity 
+exploitation is a possible treat. Moreover, since we were able to 
+differentiate between MySQL operations, we believe that an attacker can 
+successfully gain knowledge of the real workload of the latter mentioned host, 
+which in turn would provide information to when would be the best time a 
+memory trace should take place. Something that we are convinced the owner of 
+the machine would not be happy to openly disclose. Though we did not have 
+enough time to completely exploit the previously mentioned scenario, we have 
+no doubt that the treat of information leakage is as present as ever and that 
+the topic should be extensively researched as the popularity of Web-based 
+applications and economically beneficial MySQL integrations is continuously 
+increasing.
 \end{document}
