@@ -54,15 +54,21 @@ To obtain sensitive information from a particular application through the
 exploitation of \textbf{memory traces}\footnote{Requested memory addresses 
 that missed in the lowest level of cache, along with the associated type of 
 request (instruction read, data read, data write).} and 
-\textbf{disk traces}\footnote{Block read requests}, an attacker must first be 
-able to fingerprint the application of interest and recognize or compile a set 
-of data related to the targeted application's normal operational behaviors. 
-Once such dataset of application specific actions has been generated, a 
-potential attacker would have a sufficient foundation to explore various data 
-mining techniques by which he/she might be able to compare, match, analyze and 
-eventually extract viable information from the signature traces 
-from the targeted machine. The attacks vary with the target program, which are
-discussed in the following sections.
+\textbf{disk traces}\footnote{Block read/write requests}, an attacker must 
+first be able to fingerprint the application of interest and recognize or 
+compile a set of data related to the targeted application's normal operational 
+behaviors. Once such dataset of application specific actions has been 
+generated, a potential attacker would have a sufficient foundation to explore 
+various data mining techniques by which he/she might be able to compare, 
+match, analyze and eventually extract viable information from the signature 
+traces from the targeted machine.
+
+For this project, we gathered information using the software tools Cachegrind
+and blktrace rather than tampering into actual hardware. In addition, we 
+assumed single processes running on single CPUs. Depending on the program that 
+we chose to attack, we developed different ways of analyzing the traces to
+form possible attacks, which we discuss further in the following sections.
+
 
 \section{SVN Version Control Analysis}
 \subsection{Application Overview}
@@ -76,10 +82,34 @@ discussed in the following sections.
 \subsection{Tools and Results}
 \subsection{Conclusion}
 
-\section{Squid Proxy Analysis}
+\section[Squid Proxy Analysis]{Squid\footnote{Version 3.1} Proxy Analysis}
 \subsection{Application Overview}
-\subsection{Analysis Process}
+Web proxies can improve performance by caching commonly visited websites 
+into memory or disk and retrieving the web page data on subsequent requests 
+to that page. It is this functionality that we hope to use in an attack. On 
+cache misses, we should see memory accesses to store the resources. On 
+cache hits, we expect to see memory accesses back to the previously visited
+address. If we can figure out this mapping from memory location to resource,
+we would be able to figure out when someone is accessing a specific resource, 
+like a site-key image.
+
+We chose Squid over other web proxies because it is widely available and well 
+known. In addition, Squid is open source and can run as a single process 
+daemon, which makes it easier (for us) to analyze the memory traces.
+
+\subsection{Attack Strategy}
+Our proposed strategy was to start Squid with an empty cache, access a web 
+page, and figure out which memory addresses were accessed. Then we would
+access a new web page and find the memory addresses unique to each request. 
+From this we should be able to generate features unique to those web pages.
+To prevent the CPU cache from storing everything internally, we flood the
+CPU cache with other websites in between accesses.
+
+By reading the documentation on Squid, we found out that Squid caches both in 
+disk and memory, so we gathered both disk traces and memory traces.
+
 \subsection{Tools and Results}
+
 \subsection{Conclusion}
 
 \section{MySQL Analysis}
