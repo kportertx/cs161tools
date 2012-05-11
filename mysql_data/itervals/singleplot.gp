@@ -13,7 +13,7 @@ set bmargin 10
 
 #set terminal latex
 #set output "eg1.tex"
-set term png x222222 xffffff size 1440, 900 font ",10"
+set term png x222222 xffffff size 1440, 900 font ",12"
 set output "MySQLAnal.png"
 
 set style line 1 lt 2 lc rgb "red" lw 3
