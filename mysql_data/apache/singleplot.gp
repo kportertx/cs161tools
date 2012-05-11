@@ -1,4 +1,4 @@
-set xrange [0:14236300]
+set xrange [0:5236300]
 set yrange [0:1]
 set xlabel "GARBAGE INSERT INSERT INSERT SELECT2 SELECT2 SELECT2 DELETE INSERT INSERT GARBAGE SELECT4 GARBAGE DELETE DELETE INSERT SELECT5 GARBAGE DELETE INSERT INSERT GARBAGE\n\n\nMemory Sequence ID (in millions)" font ",8"
 set ylabel "Probability" font ",8"
@@ -6,7 +6,7 @@ set grid
 set key font ",10
 set pointsize 1
 set ytics 0,0.25,1.0
-set xtics 0,4000000, 14000000
+set xtics 0,1000000, 5000000
 set mxtics 4
 set format x "%.0s"
 set bmargin 10
