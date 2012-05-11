@@ -91,7 +91,8 @@ cache misses, we should see memory accesses to store the resources. On
 cache hits, we expect to see memory accesses back to the previously visited
 address. If we can figure out this mapping from memory location to resource,
 we would be able to figure out when someone is accessing a specific resource, 
-like a site-key image.
+like a site-key image. This attack would completely bypass the TLS protection
+that makes HTTPS secure.
 
 We chose Squid over other web proxies because it is widely available and well 
 known. In addition, Squid is open source and can run as a single process 
@@ -103,10 +104,45 @@ page, and figure out which memory addresses were accessed. Then we would
 access a new web page and find the memory addresses unique to each request. 
 From this we should be able to generate features unique to those web pages.
 To prevent the CPU cache from storing everything internally, we flood the
-CPU cache with other websites in between accesses.
+CPU cache with a large sequence of HTTP requests in between accesses.
 
-By reading the documentation on Squid, we found out that Squid caches both in 
-disk and memory, so we gathered both disk traces and memory traces.
+By reading the documentation on Squid, we found out that Squid caches objects
+both in-memory and on-disk, disk and memory, so we gathered both memory traces
+and disk traces.
+
+\subsection{Memory Traces}
+We first looked for a correlation between requests to the proxy and memory
+accesses. Our primary test workload consisted of two cases - one where
+a client accessed a sequence of wikipedia articles resulting in only cache
+misses and one where a client accessed a sequence of wikipedia articles
+twice, resulting in a sequence of misses followed by a sequence of hits.
+
+Unfortunately, when we first collected traces, we discovered that due to
+the large cpu cache size, there were almost no accesses to main memory
+after Squid finished initialization. In a real attack, this would be less
+of an issue as the cache would be invalidated by context-switching and
+would be under greater load; in order to simulate this, we decreased the
+effective L2 cache size from 8MiB to 64KiB.
+
+Running the traces again, we were able to get a more representative view
+of Squid's memory access pattern.
+
+smash6.png/smash7.png should be resized and be inserted here
+
+However, comparing the two workloads,
+we weren't able to make out any discernable difference in their access
+patterns. After reading through the Squid API documentation, we learned
+that Squid makes heavy use of memory pools to avoid internal memory
+fragmentation. Footnote to http://www.squid-cache.org/Doc/code/group__MemPoolsAPI.html goes here.
+
+
+ As a side-effect, Squid exibits very good cache locality
+and thus still makes relatively few accesses to main memory, and when
+it does, the addresses are from the same shared memory pool. As a result,
+we concluded that it would be impractical to try to map content to addresses
+in Squid's in-memory cache.
+
+\subsection{Disk Traces}
 
 \subsection{Tools and Results}
 
