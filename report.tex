@@ -1,6 +1,10 @@
 \documentclass[11pt, oneside]{article}
 \usepackage{listings}
 \usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
+
+\newcommand{\fref}[1]{Figure~\ref{#1}}
 
 \begin{document}
 \title{Memory and Data Access Privacy}
@@ -107,36 +111,53 @@ To prevent the CPU cache from storing everything internally, we flood the
 CPU cache with a large sequence of HTTP requests in between accesses.
 
 By reading the documentation on Squid, we found out that Squid caches objects
-both in-memory and on-disk, disk and memory, so we gathered both memory traces
+both in-memory and on-disk, so we gathered both memory traces
 and disk traces.
 
 \subsection{Memory Traces}
 We first looked for a correlation between requests to the proxy and memory
-accesses. Our primary test workload consisted of two cases - one where
-a client accessed a sequence of wikipedia articles resulting in only cache
-misses and one where a client accessed a sequence of wikipedia articles
+accesses. Our primary test workload consisted of two cases---one where
+a client accessed a sequence of Wikipedia articles resulting in only cache
+misses and one where a client accessed a sequence of Wikipedia articles
 twice, resulting in a sequence of misses followed by a sequence of hits.
 
 Unfortunately, when we first collected traces, we discovered that due to
-the large cpu cache size, there were almost no accesses to main memory
+the large CPU cache size, there were almost no accesses to main memory
 after Squid finished initialization. In a real attack, this would be less
 of an issue as the cache would be invalidated by context-switching and
 would be under greater load; in order to simulate this, we decreased the
 effective L2 cache size from 8MiB to 64KiB.
 
 Running the traces again, we were able to get a more representative view
-of Squid's memory access pattern.
+of Squid's memory access pattern, as shown in \fref{fig:smash}.
 
-smash6.png/smash7.png should be resized and be inserted here
+\begin{figure}[h]
+    \centering
+    \subfigure[Memory pattern after accessing 100 Wikipedia sites] {
+    	\includegraphics[height=2.5in]{smash5.png}
+	    \label{fig:smash5}
+	}
+	\subfigure[Memory pattern after accessing 100 Wikipedia sites, and 
+	then hitting the same 100 sites again.] {
+	    \includegraphics[height=2.5in]{smash6.png}
+	    \label{fig:smash6}
+	}
+	\caption{Relative memory access patterns. One pixel on the x-axis is 
+	roughly 100 or so instructions. The y-axis shows relative memory accesses 
+	(not to scale). The graphs show the last 5000 memory traces. (Thus, the 
+	left side of \fref{fig:smash5} is part of initialization.)}
+	\label{fig:smash}
+\end{figure}
 
 However, comparing the two workloads,
 we weren't able to make out any discernable difference in their access
 patterns. After reading through the Squid API documentation, we learned
 that Squid makes heavy use of memory pools to avoid internal memory
-fragmentation. Footnote to http://www.squid-cache.org/Doc/code/group__MemPoolsAPI.html goes here.
+fragmentation.\footnote{
+{\tt http://www.squid-cache.org/Doc/code/group\_\_MemPoolsAPI.html}}
 
 
- As a side-effect, Squid exibits very good cache locality
+As a side-effect, Squid exhibits very good cache locality
 and thus still makes relatively few accesses to main memory, and when
 it does, the addresses are from the same shared memory pool. As a result,
 we concluded that it would be impractical to try to map content to addresses
@@ -144,9 +165,33 @@ in Squid's in-memory cache.
 
 \subsection{Disk Traces}
 
-\subsection{Tools and Results}
+Being unable to get any useful information from memory traces, we turned to 
+collecting disk traces. Since Squid uses disk in addition to memory to cache 
+data, we should be able to make some rough mapping from a site to a block
+sector. To get block traces, we ran the Linux tool {\tt blktrace} after
+Squid had initialized and accessed 1000 Wikipedia sites (totalling 180 MB
+worth of data). However, the block traces that we got showed only a read 
+operation happening on the disk every 15 seconds, which was no different from 
+the access pattern that we got for not visiting any sites.
+
+We are unsure the cause of this read that occurs every 15 seconds---our 
+current theory is that it is looking at metadata. However, the cause of the 
+reads are less important than the cause of the lack of writes; if we
+accessed a thousand sites without getting a write operation, mapping resources 
+to disk blocks would nigh impossible, since we would need to know what data
+has been written into the disk block, which is not necessarily linked to the
+requested website that caused Squid to write to disk.
 
 \subsection{Conclusion}
+
+As a result of Squid memory optimizations and powerful computers, we were 
+not able to find any unique patterns to correspond to resources being loaded. 
+Squid's memory management not only achieves better performance, but it also 
+obfuscates the memory access pattern. In addition, the large size of caches
+and block sectors in today's computers make it hard to even get any traces 
+for small requests. Exploiting Squid may be possible with an even larger
+set, but it is unlikely that we would be able to find a correlation between
+resources and memory accesses.
 
 \section{MySQL Analysis}
 
