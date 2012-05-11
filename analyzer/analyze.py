@@ -61,11 +61,7 @@ for z, feat in enumerate(features):
     data = p.map(processFeature, map(lambda j: (j, feat), range(0, data_len, tstep)))
     for i, result in enumerate(data):
         # outputs a file readable by gnuplot
-<<<<<<< HEAD
-        if result > 0.3:
-=======
         if result != 0.0:  # do not print 0.0.  This just reduces number of points and make gunplot work a little better
->>>>>>> 1bd188b5d8959ee791ad32aa47096fa237d01b80
             line = str(float(i*step)) + " " + str(result) + "\n"
             gp.write(line)
     gp.close()
