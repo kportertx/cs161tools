@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{subfigure}
 \usepackage{float}
+\usepackage[margin=1in]{geometry}
 
 \newcommand{\fref}[1]{Figure~\ref{#1}}
 
@@ -128,11 +129,11 @@ optimizations beyond our direct control.
 \begin{figure}[H]
     \centering
     \subfigure{
-    	\includegraphics[height=7.2in]{SVN_left.png}
+    	\includegraphics[height=7.6in]{SVN_left.png}
 	    \label{fig:svn_left}
 	}
 	\subfigure{
-	    \includegraphics[height=7.2in]{SVN_right.png}
+	    \includegraphics[height=7.6in]{SVN_right.png}
 	    \label{fig:svn_right}
 	}
 	\caption{Disk access graphs}
@@ -163,9 +164,89 @@ differential commit and a delete command (given our data set).
 
 \section{IRC Server Analysis}
 \subsection{Application Overview}
+This part of the project focused on an IRC daemon and its memory access 
+patterns. Although IRC is not a particularly secure means of communication, we 
+feel that this attack is representative of a class of attacks that could be 
+applied to most programs. Our attack on Dancer-IRCD should be regarded as a 
+proof-of-concept.
+
+We made an attempt to identify common tasks users perform when interacting 
+with the server. If we can identify commands being run on an IRC server, then 
+it should be possible to identify commands being run on other application 
+servers. The tests were performed on Dancer-IRCD, a relatively common IRC 
+server. We used the modified version of chachegrind to record memory accesses. 
+In particular, we collected memory traces for seven commands: connect, list, 
+create room, quit, join, kick, and part. We then created a classification 
+algorithm that was able to correctly predict all unknown commands from a 
+validation set.
+
 \subsection{Analysis Process}
+The first challenge we faced was that the IRC server fit almost completely in 
+the CPU cache. We had to reduce the cache size used by Valgrind to 32KB level 
+1 instruction and data caches, and a 64 KB level 2 cache in order to get 
+meaningful results, since with any larger size cache we were not able to get 
+any memory accesses in some situations.
+
+Initially, we had written a simple IRC client that played random messages of 
+varying lengths onto the server and recorded the results automatically, but we 
+found that we could not conduct meaningful analysis on the data collected this 
+way. Instead, we realized that it would be more efficient to generate  memory 
+traces for each command we were going to try and detect. This was done 
+manually using an existing IRC client (irssi), where we repeatedly executed 
+the same commands and recorded the corresponding accesses. 
+
+We trained our command classifier on a set of memory traces corresponding to 
+that command. For each command we took the intersection of the memory 
+addresses from the traces in that command's training set. Our first attempt at 
+classification was to take the intersection of the trace from an unknown 
+command, and the subset associated with a command. Whichever command had the 
+highest ratio (matched addresses/total addresses) was declared to match.
+
+An issue occurred when a command had few identifying features that were 
+contained in a larger set of features for another command. The algorithm would 
+classify the trace as the command with the smaller feature set, even though 
+the trace actually corresponded to the command with the larger feature set. 
+
+To solve this problem, we realized that it would make sense to start with the 
+largest feature set first. If a match was found for a large command set with a 
+certainty above a specified threshold, the algorithm would stop searching and 
+declare a command found. If no command reached the threshold, the highest 
+rated command would be used. We set the threshold at 0.75, based on trends we 
+saw in the data. In almost all cases, if a command was matched with at least 
+0.75 accuracy, then it was likely correct. Another way to address this issue 
+was to increase the training set size. With a training set of ten memory 
+traces per command, this issue became negligible.
+
 \subsection{Tools and Results}
+From the data that the matching program output, we generated graphs to 
+visualize our results. The program runs the intersecting set for each command 
+against command to be classified, and outputs a likelihood for the commands. 
+The largest of these is the matching result in most cases. However, very 
+occasionally there would be more than one commands with equal probabilities, 
+or values above the cutoff. For these, the solution was to sort by size and 
+pick the larger one, as described in the analysis section. The sample shown 
+below illustrates the issue, where both join and create room have the same 
+probabilities.
+
+The rest of the graphs show examples of the respective commands, where we did 
+not strictly require the sorting part of the process to obtain the correct 
+result.
+
+We were able to correctly classify 69/70 of the commands in the verification 
+set. We classified create room with 90\% accuracy, and all other commands with 
+100\% accuracy. For the probabilites assigned to each command, see irc\_
+results.odg in the supplemental code submission.
+
+\includegraphics[height=6.47in, width=5in]{irc1.jpg}\\
+\includegraphics[height=6.47in, width=5in]{irc2.jpg}
+
 \subsection{Conclusion}
+We were able to successfully recognize all seven commands we issued to an IRC 
+server with a high degree of accuracy, while using only a simulation of the 
+addresses available on the memory bus. However, to achieve this, we had to 
+decrease the cache size so that we could observe memory accesses. To 
+extrapolate from this result, a memory bus based attack seems possible for 
+programs that have executables significantly larger than that of Dancer-IRCD. 
 
 \section[Squid Proxy Analysis]{Squid\footnote{Version 3.1} Proxy Analysis}
 \subsection{Application Overview}
@@ -215,12 +296,12 @@ of Squid's memory access pattern, as shown in \fref{fig:smash}.
 \begin{figure}[h]
     \centering
     \subfigure[Memory pattern after accessing 100 Wikipedia sites] {
-    	\includegraphics[height=2.5in]{smash5.png}
+    	\includegraphics[width=3in]{smash5.png}
 	    \label{fig:smash5}
 	}
 	\subfigure[Memory pattern after accessing 100 Wikipedia sites, and 
 	then hitting the same 100 sites again.] {
-	    \includegraphics[height=2.5in]{smash6.png}
+	    \includegraphics[width=3in]{smash6.png}
 	    \label{fig:smash6}
 	}
 	\caption{Relative memory access patterns. One pixel on the x-axis is 
@@ -353,7 +434,7 @@ $$\text{Chance of feature in step} =
     \frac{|\beta\cap S_x|}{min(|\beta|, |S_x|)}$$
 Safe each feature to separate files and plot the results.
 
-\section{Final Remarks}
+\subsection{Final Remarks}
 Ever since the popularization of the LAMP stack framework to enterprise 
 production environments, the question of whether or not an open source tool 
 like MySQL would be able to meet the fast paced demanding IT infrastructure 
