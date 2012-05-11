@@ -14,6 +14,9 @@ set xtics 0,4000000, 13000000
 set mxtics 4
 set format x "%.0s"
 
+set term png x222222 xffffff size 1920, 1080 font ",12"
+set output "MySQLMultiAnal.png"
+
 # Uncomment the following to line up the axes
 # set lmargin 6
 

@@ -439,30 +439,32 @@ In the course of this project's time frame we were able to generate and collect
 a large amounts of diverse data traces that were used as a training data set of
 our analysis algorithm. One such workload is the fallowing SQL query list:
 
-INSERT1 => insert into urls (url) values("testing1.com");
-INSERT1 => insert into urls (url) values("testing1.com");
-INSERT1 => insert into urls (url) values("testing1.com");
-SELECT2 => select title from ebay_listings where BuyItNow > 2000;
-SELECT2 => select title from ebay_listings where BuyItNow > 2000;
-SELECT2 => select title from ebay_listings where BuyItNow > 2000;
-SELECT2 => select title from ebay_listings where BuyItNow > 2000;
-DELETE1 => delete from urls where url like '%testing1.com%'; 
-INSERT1 => insert into urls (url) values("testing1.com");
-INSERT1 => insert into urls (url) values("testing1.com");
-SELECT4 => select title from purchases where price > 2000;
-DELETE1 => delete from urls where url like '%testing1.com%' and url.id = '308924';
-DELETE1 => delete from urls where url like '%testing1.com%' and url.id = '308925';
-INSERT => insert into urls (url) values("testing3.com");
-DELETE1 => from urls where url like '%10.50.50.174%';
-INSERT1 => insert into urls (url) values("testing1.com");
-INSERT1 => insert into urls (url) values("testing1.com");
+\begin{quote}
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+SELECT2 $\Longrightarrow$ select title from ebay\_listings where BuyItNow $>$ 2000;\\
+SELECT2 $\Longrightarrow$ select title from ebay\_listings where BuyItNow $>$ 2000;\\
+SELECT2 $\Longrightarrow$ select title from ebay\_listings where BuyItNow $>$ 2000;\\
+SELECT2 $\Longrightarrow$ select title from ebay\_listings where BuyItNow $>$ 2000;\\
+DELETE1 $\Longrightarrow$ delete from urls where url like '\%testing1.com\%'; \\
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+SELECT4 $\Longrightarrow$ select title from purchases where price $>$ 2000;\\
+DELETE1 $\Longrightarrow$ delete from urls where url like '\%testing1.com\%' and url.id = '308924';\\
+DELETE1 $\Longrightarrow$ delete from urls where url like '\%testing1.com\%' and url.id = '308925';\\
+INSERT $\Longrightarrow$ insert into urls (url) values("testing3.com");\\
+DELETE1 $\Longrightarrow$ from urls where url like '\%10.50.50.174\%';\\
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+INSERT1 $\Longrightarrow$ insert into urls (url) values("testing1.com");\\
+\end{quote}
 
 Though this query set may seem compact, the individual queries were interleaved
 randomly with large amounts of garbage data that was used to flush our simulator's
 cache. The collected data was pushed through our analysis tools and the graph 
 produced from gnuplot is as follows:
 
-INSERT GRAPH HERE !!!
+\includegraphics[height=4in, width=6.5in]{MySQLAnal.png}
 
 As you can see after extensive feature training our data analysis tools are able to
 predict quite accurately the order and type of instructions executed ragardless of 
@@ -500,7 +502,7 @@ specific logical syntax was performed. Examples are :
 \def\smalldash{\underbar{\hskip .3in}~}
 \begin{quote}
 {\tt SELECT \smalldash FROM \smalldash WHERE \smalldash = \smalldash;} \\
-{\tt SELECT \smalldash FROM \smalldash WHERE \smalldash > \smalldash;} \\
+{\tt SELECT \smalldash FROM \smalldash WHERE \smalldash $>$ \smalldash;} \\
 {\tt SELECT \smalldash FROM \smalldash WHERE \smalldash LIKE \smalldash;}
 \end{quote}
 \item We can differentiate between the different type of SQL operations – 
@@ -512,8 +514,6 @@ long as the data stream is not encrypted, we could potentially extract more
 query specific information as our initial goal was close to recovering 
 database schema.
 \end{enumerate}
-
-\includegraphics[height=4in, width=6.5in]{MySQLAnal.png}
 
 In summary, our part of the overall project proved sufficient to provide a 
 good a foundation for a potentially more fine grained area of research on the 
