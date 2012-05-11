@@ -434,6 +434,40 @@ $$\text{Chance of feature in step} =
     \frac{|\beta\cap S_x|}{min(|\beta|, |S_x|)}$$
 Safe each feature to separate files and plot the results.
 
+\subsection{Sample Workload and Results}
+In the course of this project's time frame we were able to generate and collect
+a large amounts of diverse data traces that were used as a training data set of
+our analysis algorithm. One such workload is the fallowing SQL query list:
+
+INSERT1 => insert into urls (url) values("testing1.com");
+INSERT1 => insert into urls (url) values("testing1.com");
+INSERT1 => insert into urls (url) values("testing1.com");
+SELECT2 => select title from ebay_listings where BuyItNow > 2000;
+SELECT2 => select title from ebay_listings where BuyItNow > 2000;
+SELECT2 => select title from ebay_listings where BuyItNow > 2000;
+SELECT2 => select title from ebay_listings where BuyItNow > 2000;
+DELETE1 => delete from urls where url like '%testing1.com%'; 
+INSERT1 => insert into urls (url) values("testing1.com");
+INSERT1 => insert into urls (url) values("testing1.com");
+SELECT4 => select title from purchases where price > 2000;
+DELETE1 => delete from urls where url like '%testing1.com%' and url.id = '308924';
+DELETE1 => delete from urls where url like '%testing1.com%' and url.id = '308925';
+INSERT => insert into urls (url) values("testing3.com");
+DELETE1 => from urls where url like '%10.50.50.174%';
+INSERT1 => insert into urls (url) values("testing1.com");
+INSERT1 => insert into urls (url) values("testing1.com");
+
+Though this query set may seem compact, the individual queries were interleaved
+randomly with large amounts of garbage data that was used to flush our simulator's
+cache. The collected data was pushed through our analysis tools and the graph 
+produced from gnuplot is as follows:
+
+INSERT GRAPH HERE !!!
+
+As you can see after extensive feature training our data analysis tools are able to
+predict quite accurately the order and type of instructions executed ragardless of 
+the presence of noisy data.
+
 \subsection{Final Remarks}
 Ever since the popularization of the LAMP stack framework to enterprise 
 production environments, the question of whether or not an open source tool 
